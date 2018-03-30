@@ -7,7 +7,7 @@
     "cmd/kube-apiserver"
     "cmd/kube-controller-manager"
     "cmd/kube-proxy"
-    "plugin/cmd/kube-scheduler"
+    "cmd/kube-scheduler"
     "test/e2e/e2e.test"
   ]
 }:
@@ -16,16 +16,16 @@ with lib;
 
 stdenv.mkDerivation rec {
   name = "kubernetes-${version}";
-  version = "1.9.7";
+  version = "1.10.0";
 
   src = fetchFromGitHub {
     owner = "kubernetes";
     repo = "kubernetes";
     rev = "v${version}";
-    sha256 = "1dykh48c6bvypg51mlxjdyrggpjq597mjj83xgj1pfadsy6pp9bh";
+    sha256 = "0k6m55p0q8qscg8l7y1ymmp5vc3i07znqk61g4hs1gx0dj3id6mc";
   };
 
-  # go > 1.10 should be fixed by https://github.com/kubernetes/kubernetes/pull/60373
+  # go > 1.10 should be fixed by https://github.com/kubernetes/kubernetes/pull/60597
   buildInputs = [ removeReferencesTo makeWrapper which go_1_9 rsync go-bindata ];
 
   outputs = ["out" "man" "pause"];
@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    mkdir -p "$out/bin" "$out/share/bash-completion/completions" "$out/share/zsh/site-functions" "$man/share/man" "$pause/bin"
+    mkdir -p "$out/bin" "$out/share/bash-completion/completions" "$man/share/man" "$pause/bin"
 
     cp _output/local/go/bin/* "$out/bin/"
     cp build/pause/pause "$pause/bin/pause"
@@ -59,7 +59,6 @@ stdenv.mkDerivation rec {
     wrapProgram $out/bin/kube-addons --set "KUBECTL_BIN" "$out/bin/kubectl"
 
     $out/bin/kubectl completion bash > $out/share/bash-completion/completions/kubectl
-    $out/bin/kubectl completion zsh > $out/share/zsh/site-functions/_kubectl
   '';
 
   preFixup = ''
@@ -69,7 +68,7 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Production-Grade Container Scheduling and Management";
     license = licenses.asl20;
-    homepage = https://kubernetes.io;
+    homepage = http://kubernetes.io;
     maintainers = with maintainers; [offline];
     platforms = platforms.unix;
   };
